@@ -1,0 +1,608 @@
+-- =====================================================
+-- STEAL A BRAINROT GUI - FULLY FIXED
+-- ✅ Toggle circles now visible
+-- ✅ Mobile & PC dragging support
+-- ✅ Bottom text fully visible
+-- ✅ ! button with private server detection
+-- =====================================================
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+
+-- SCREEN GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "StealBrainrotGUI"
+ScreenGui.IgnoreGuiInset = false
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = game.CoreGui or player:WaitForChild("PlayerGui")
+
+-- MAIN FRAME
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 260, 0, 270)
+MainFrame.Position = UDim2.new(0.5, -130, 0.7, -135)
+MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 10, 28)
+MainFrame.BorderSizePixel = 0
+MainFrame.ZIndex = 1
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 12)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Thickness = 2
+MainStroke.Color = Color3.fromRGB(160, 60, 220)
+MainStroke.Parent = MainFrame
+
+-- GRADIENT BACKGROUND
+local MainGradient = Instance.new("UIGradient")
+MainGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(18, 10, 28)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(28, 10, 45))
+})
+MainGradient.Rotation = 135
+MainGradient.Parent = MainFrame
+
+-- TITLE BAR
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 38)
+TitleBar.BackgroundColor3 = Color3.fromRGB(30, 10, 50)
+TitleBar.BorderSizePixel = 0
+TitleBar.Active = true
+TitleBar.ZIndex = 2
+TitleBar.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = TitleBar
+
+local TitleStroke = Instance.new("UIStroke")
+TitleStroke.Thickness = 1
+TitleStroke.Color = Color3.fromRGB(160, 60, 220)
+TitleStroke.Parent = TitleBar
+
+-- TITLE GRADIENT
+local TitleGradient = Instance.new("UIGradient")
+TitleGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(200, 80, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 120, 80)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 180, 255))
+})
+TitleGradient.Rotation = 0
+
+local Title = Instance.new("TextLabel")
+Title.Text = "🧠 STEAL A BRAINROT"
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 14
+Title.TextColor3 = Color3.fromRGB(220, 150, 255)
+Title.BackgroundTransparency = 1
+Title.Size = UDim2.new(1, -82, 1, 0)
+Title.Position = UDim2.new(0, 12, 0, 0)
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 3
+Title.Parent = TitleBar
+
+-- CLOSE BUTTON
+local CloseButton = Instance.new("TextButton")
+CloseButton.Size = UDim2.new(0, 26, 0, 26)
+CloseButton.Position = UDim2.new(1, -30, 0.5, -13)
+CloseButton.Text = "×"
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 18
+CloseButton.TextColor3 = Color3.fromRGB(255, 100, 120)
+CloseButton.BackgroundColor3 = Color3.fromRGB(50, 20, 65)
+CloseButton.BorderSizePixel = 0
+CloseButton.ZIndex = 3
+CloseButton.Parent = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
+
+-- ! WARN BUTTON
+local WarnButton = Instance.new("TextButton")
+WarnButton.Size = UDim2.new(0, 26, 0, 26)
+WarnButton.Position = UDim2.new(1, -62, 0.5, -13)
+WarnButton.Text = "!"
+WarnButton.Font = Enum.Font.GothamBold
+WarnButton.TextSize = 16
+WarnButton.TextColor3 = Color3.fromRGB(255, 210, 80)
+WarnButton.BackgroundColor3 = Color3.fromRGB(50, 20, 65)
+WarnButton.BorderSizePixel = 0
+WarnButton.ZIndex = 3
+WarnButton.Parent = TitleBar
+
+local WarnCorner = Instance.new("UICorner")
+WarnCorner.CornerRadius = UDim.new(0, 6)
+WarnCorner.Parent = WarnButton
+
+-- NOTIFICATION FUNCTION
+local function showNotification(title, message)
+    StarterGui:SetCore("SendNotification", {
+        Title = title;
+        Text = message;
+        Duration = 5;
+    })
+end
+
+-- PRIVATE SERVER DETECTION
+local function isPrivateServer()
+    return #Players:GetPlayers() <= 1
+end
+
+local function updateWarnButton()
+    if isPrivateServer() then
+        WarnButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+        WarnButton.BackgroundColor3 = Color3.fromRGB(60, 20, 35)
+    else
+        WarnButton.TextColor3 = Color3.fromRGB(255, 210, 80)
+        WarnButton.BackgroundColor3 = Color3.fromRGB(50, 20, 65)
+    end
+end
+
+WarnButton.MouseButton1Click:Connect(function()
+    if isPrivateServer() then
+        showNotification("PRIVATE SERVER DETECTED", "Private servers are not supported, rejoin and use in public!")
+    else
+        showNotification("REMINDER", "THIS SCRIPT WONT WORK IN PRIVATE SERVERS!")
+    end
+end)
+
+Players.PlayerAdded:Connect(updateWarnButton)
+
+local guiVisible = true
+
+CloseButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    guiVisible = false
+    CircleToggle.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
+end)
+
+-- USERNAME INPUT SECTION
+local UsernameSection = Instance.new("Frame")
+UsernameSection.Size = UDim2.new(1, -24, 0, 68)
+UsernameSection.Position = UDim2.new(0, 12, 0, 46)
+UsernameSection.BackgroundColor3 = Color3.fromRGB(28, 12, 42)
+UsernameSection.BorderSizePixel = 0
+UsernameSection.ZIndex = 2
+UsernameSection.Parent = MainFrame
+
+local UsernameCorner = Instance.new("UICorner")
+UsernameCorner.CornerRadius = UDim.new(0, 8)
+UsernameCorner.Parent = UsernameSection
+
+local UsernameStroke = Instance.new("UIStroke")
+UsernameStroke.Thickness = 1
+UsernameStroke.Color = Color3.fromRGB(120, 40, 180)
+UsernameStroke.Parent = UsernameSection
+
+local UsernameLabel = Instance.new("TextLabel")
+UsernameLabel.Text = "🎯 Victims Username:"
+UsernameLabel.Font = Enum.Font.GothamBold
+UsernameLabel.TextSize = 12
+UsernameLabel.TextColor3 = Color3.fromRGB(200, 150, 255)
+UsernameLabel.BackgroundTransparency = 1
+UsernameLabel.Size = UDim2.new(1, -12, 0, 18)
+UsernameLabel.Position = UDim2.new(0, 8, 0, 5)
+UsernameLabel.TextXAlignment = Enum.TextXAlignment.Left
+UsernameLabel.ZIndex = 3
+UsernameLabel.Parent = UsernameSection
+
+-- Username TextBox
+local UsernameBox = Instance.new("TextBox")
+UsernameBox.Size = UDim2.new(1, -82, 0, 30)
+UsernameBox.Position = UDim2.new(0, 8, 0, 30)
+UsernameBox.BackgroundColor3 = Color3.fromRGB(38, 15, 58)
+UsernameBox.BorderSizePixel = 0
+UsernameBox.Text = ""
+UsernameBox.PlaceholderText = "Enter username..."
+UsernameBox.Font = Enum.Font.Gotham
+UsernameBox.TextSize = 13
+UsernameBox.TextColor3 = Color3.fromRGB(230, 200, 255)
+UsernameBox.PlaceholderColor3 = Color3.fromRGB(130, 90, 160)
+UsernameBox.TextXAlignment = Enum.TextXAlignment.Left
+UsernameBox.ClearTextOnFocus = false
+UsernameBox.ZIndex = 3
+UsernameBox.Parent = UsernameSection
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.Parent = UsernameBox
+
+local BoxStroke = Instance.new("UIStroke")
+BoxStroke.Thickness = 1
+BoxStroke.Color = Color3.fromRGB(140, 50, 200)
+BoxStroke.Parent = UsernameBox
+
+local BoxPadding = Instance.new("UIPadding")
+BoxPadding.PaddingLeft = UDim.new(0, 8)
+BoxPadding.PaddingRight = UDim.new(0, 8)
+BoxPadding.Parent = UsernameBox
+
+-- Profile Picture Display
+local ProfilePic = Instance.new("ImageLabel")
+ProfilePic.Size = UDim2.new(0, 52, 0, 52)
+ProfilePic.Position = UDim2.new(1, -58, 0, 8)
+ProfilePic.BackgroundColor3 = Color3.fromRGB(40, 15, 60)
+ProfilePic.BorderSizePixel = 0
+ProfilePic.Image = ""
+ProfilePic.ZIndex = 3
+ProfilePic.Parent = UsernameSection
+
+local PicCorner = Instance.new("UICorner")
+PicCorner.CornerRadius = UDim.new(1, 0)
+PicCorner.Parent = ProfilePic
+
+local PicStroke = Instance.new("UIStroke")
+PicStroke.Thickness = 2
+PicStroke.Color = Color3.fromRGB(160, 60, 220)
+PicStroke.Parent = ProfilePic
+
+-- Status indicator inside profile pic
+local StatusIndicator = Instance.new("TextLabel")
+StatusIndicator.Size = UDim2.new(1, 0, 1, 0)
+StatusIndicator.BackgroundTransparency = 1
+StatusIndicator.Text = "?"
+StatusIndicator.Font = Enum.Font.GothamBold
+StatusIndicator.TextSize = 22
+StatusIndicator.TextColor3 = Color3.fromRGB(180, 100, 230)
+StatusIndicator.ZIndex = 4
+StatusIndicator.Parent = ProfilePic
+
+-- TOGGLES
+local stealEnabled = false
+local acceptEnabled = false
+local targetPlayer = nil
+local targetUsername = ""
+
+local function createToggle(text, y)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, 0, 0, 40)
+    frame.Position = UDim2.new(0, 0, 0, y)
+    frame.BackgroundColor3 = Color3.fromRGB(28, 12, 42)
+    frame.BorderSizePixel = 0
+    frame.ZIndex = 3
+    frame.Parent = MainFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = frame
+
+    local fstroke = Instance.new("UIStroke")
+    fstroke.Thickness = 1
+    fstroke.Color = Color3.fromRGB(100, 30, 150)
+    fstroke.Parent = frame
+
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 12
+    label.TextColor3 = Color3.fromRGB(220, 180, 255)
+    label.BackgroundTransparency = 1
+    label.Size = UDim2.new(1, -90, 1, 0)
+    label.Position = UDim2.new(0, 12, 0, 0)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.ZIndex = 4
+    label.Parent = frame
+
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 50, 0, 24)
+    button.Position = UDim2.new(1, -62, 0.5, -12)
+    button.BackgroundColor3 = Color3.fromRGB(55, 20, 75)
+    button.BorderSizePixel = 0
+    button.Text = ""
+    button.ZIndex = 4
+    button.Parent = frame
+
+    local bc = Instance.new("UICorner")
+    bc.CornerRadius = UDim.new(1, 0)
+    bc.Parent = button
+
+    local bstroke = Instance.new("UIStroke")
+    bstroke.Thickness = 1
+    bstroke.Color = Color3.fromRGB(120, 40, 170)
+    bstroke.Parent = button
+
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 20, 0, 20)
+    circle.Position = UDim2.new(0, 2, 0.5, -10)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.BorderSizePixel = 0
+    circle.ZIndex = 6
+    circle.Parent = button
+
+    local cc = Instance.new("UICorner")
+    cc.CornerRadius = UDim.new(1, 0)
+    cc.Parent = circle
+
+    local circleShadow = Instance.new("UIStroke")
+    circleShadow.Thickness = 1
+    circleShadow.Color = Color3.fromRGB(180, 80, 255)
+    circleShadow.Transparency = 0.4
+    circleShadow.Parent = circle
+
+    return button, circle, frame
+end
+
+local StealBtn, StealCircle, StealFrame = createToggle("🧠 Steal brainrot", 122)
+local AcceptBtn, AcceptCircle, AcceptFrame = createToggle("✅ Auto accept trade", 170)
+
+-- Reposition frames inside MainFrame
+StealFrame.Position = UDim2.new(0, 12, 0, 122)
+StealFrame.Size = UDim2.new(1, -24, 0, 40)
+AcceptFrame.Position = UDim2.new(0, 12, 0, 168)
+AcceptFrame.Size = UDim2.new(1, -24, 0, 40)
+
+local function toggle(btn, circle, state)
+    if state then
+        TweenService:Create(circle, TweenInfo.new(0.2), {
+            Position = UDim2.new(1, -22, 0.5, -10)
+        }):Play()
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(160, 60, 220)
+        }):Play()
+    else
+        TweenService:Create(circle, TweenInfo.new(0.2), {
+            Position = UDim2.new(0, 2, 0.5, -10)
+        }):Play()
+        TweenService:Create(btn, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.fromRGB(55, 20, 75)
+        }):Play()
+    end
+end
+
+StealBtn.MouseButton1Click:Connect(function()
+    if isPrivateServer() then
+        showNotification("PRIVATE SERVER DETECTED", "Private servers are not supported, rejoin and use in public!")
+        return
+    end
+    if targetUsername == "" or not targetPlayer then
+        showNotification("USERNAME NOT DETECTED", "Don't forget to put the players name first before stealing the brainrot!")
+        return
+    end
+    stealEnabled = not stealEnabled
+    toggle(StealBtn, StealCircle, stealEnabled)
+end)
+
+AcceptBtn.MouseButton1Click:Connect(function()
+    if isPrivateServer() then
+        showNotification("PRIVATE SERVER DETECTED", "Private servers are not supported, rejoin and use in public!")
+        return
+    end
+    if targetUsername == "" or not targetPlayer then
+        showNotification("USERNAME NOT DETECTED", "Don't forget to put the players name first before stealing the brainrot!")
+        return
+    end
+    acceptEnabled = not acceptEnabled
+    toggle(AcceptBtn, AcceptCircle, acceptEnabled)
+end)
+
+-- USERNAME DETECTION LOGIC
+local function updatePlayerInfo(username)
+    if username == "" then
+        ProfilePic.Image = ""
+        StatusIndicator.Text = "?"
+        StatusIndicator.TextColor3 = Color3.fromRGB(180, 100, 230)
+        StatusIndicator.Visible = true
+        targetPlayer = nil
+        targetUsername = ""
+
+        if stealEnabled then
+            stealEnabled = false
+            toggle(StealBtn, StealCircle, false)
+        end
+        if acceptEnabled then
+            acceptEnabled = false
+            toggle(AcceptBtn, AcceptCircle, false)
+        end
+        return
+    end
+
+    local foundPlayer = nil
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr.Name:lower() == username:lower() or plr.DisplayName:lower() == username:lower() then
+            foundPlayer = plr
+            break
+        end
+    end
+
+    if foundPlayer then
+        targetPlayer = foundPlayer
+        targetUsername = foundPlayer.Name
+
+        local userId = foundPlayer.UserId
+        ProfilePic.Image = "https://www.roblox.com/headshot-thumbnail/image?userId="..userId.."&width=150&height=150&format=png"
+        StatusIndicator.Visible = false
+    else
+        targetPlayer = nil
+        targetUsername = ""
+        ProfilePic.Image = ""
+        StatusIndicator.Text = "?"
+        StatusIndicator.TextColor3 = Color3.fromRGB(180, 100, 230)
+        StatusIndicator.Visible = true
+
+        if stealEnabled then
+            stealEnabled = false
+            toggle(StealBtn, StealCircle, false)
+        end
+        if acceptEnabled then
+            acceptEnabled = false
+            toggle(AcceptBtn, AcceptCircle, false)
+        end
+    end
+end
+
+UsernameBox:GetPropertyChangedSignal("Text"):Connect(function()
+    updatePlayerInfo(UsernameBox.Text)
+end)
+
+Players.PlayerRemoving:Connect(function()
+    task.wait(0.1)
+    updateWarnButton()
+end)
+updateWarnButton()
+
+-- DIVIDER LINE
+local Divider = Instance.new("Frame")
+Divider.Size = UDim2.new(1, -24, 0, 1)
+Divider.Position = UDim2.new(0, 12, 1, -46)
+Divider.BackgroundColor3 = Color3.fromRGB(120, 40, 180)
+Divider.BorderSizePixel = 0
+Divider.ZIndex = 3
+Divider.Parent = MainFrame
+
+-- BOTTOM WARNING TEXT
+local WarningText = Instance.new("TextLabel")
+WarningText.Size = UDim2.new(1, -16, 0, 16)
+WarningText.Position = UDim2.new(0, 8, 1, -42)
+WarningText.BackgroundTransparency = 1
+WarningText.Text = "MAKE SURE YOU ARE IN A TRADE BEFORE TURNING ON"
+WarningText.Font = Enum.Font.Gotham
+WarningText.TextSize = 9
+WarningText.TextColor3 = Color3.fromRGB(180, 130, 220)
+WarningText.TextWrapped = true
+WarningText.ZIndex = 3
+WarningText.Parent = MainFrame
+
+-- YOUTUBE CREDIT TEXT
+local YoutubeText = Instance.new("TextLabel")
+YoutubeText.Size = UDim2.new(1, -16, 0, 16)
+YoutubeText.Position = UDim2.new(0, 8, 1, -24)
+YoutubeText.BackgroundTransparency = 1
+YoutubeText.Text = "🎬 bloomscripts on youtube"
+YoutubeText.Font = Enum.Font.GothamBold
+YoutubeText.TextSize = 10
+YoutubeText.TextColor3 = Color3.fromRGB(255, 80, 80)
+YoutubeText.TextWrapped = false
+YoutubeText.ZIndex = 3
+YoutubeText.Parent = MainFrame
+
+-- Animate YouTube text color
+local ytHue = 0
+RunService.Heartbeat:Connect(function(dt)
+    ytHue = (ytHue + dt * 0.4) % 1
+    YoutubeText.TextColor3 = Color3.fromHSV(ytHue, 0.9, 1)
+end)
+
+-- =====================================================
+-- DRAG SYSTEM (MOBILE & PC)
+-- =====================================================
+
+local dragging = false
+local dragInput = nil
+local dragStart = nil
+local startPos = nil
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    MainFrame.Position = UDim2.new(
+        startPos.X.Scale,
+        startPos.X.Offset + delta.X,
+        startPos.Y.Scale,
+        startPos.Y.Offset + delta.Y
+    )
+end
+
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        updateDrag(input)
+    end
+end)
+
+-- =====================================================
+-- FLOATING TOGGLE CIRCLE (DRAGGABLE & CLICKABLE)
+-- =====================================================
+
+local CircleToggle = Instance.new("TextButton")
+CircleToggle.Size = UDim2.new(0, 52, 0, 52)
+CircleToggle.Position = UDim2.new(0, 20, 0.5, -26)
+CircleToggle.AnchorPoint = Vector2.new(0, 0)
+CircleToggle.BackgroundColor3 = Color3.fromRGB(100, 30, 150)
+CircleToggle.BorderSizePixel = 0
+CircleToggle.Text = "🧠"
+CircleToggle.TextSize = 22
+CircleToggle.ZIndex = 100
+CircleToggle.Parent = ScreenGui
+
+local CircleCorner = Instance.new("UICorner")
+CircleCorner.CornerRadius = UDim.new(1, 0)
+CircleCorner.Parent = CircleToggle
+
+local CircleStroke = Instance.new("UIStroke")
+CircleStroke.Thickness = 2
+CircleStroke.Color = Color3.fromRGB(200, 80, 255)
+CircleStroke.Parent = CircleToggle
+
+CircleToggle.MouseButton1Click:Connect(function()
+    guiVisible = not guiVisible
+    MainFrame.Visible = guiVisible
+    CircleToggle.BackgroundColor3 = guiVisible and Color3.fromRGB(100, 30, 150) or Color3.fromRGB(60, 20, 80)
+end)
+
+local circleDragging = false
+local circleInput = nil
+local circleStart = nil
+local circlePos = nil
+
+CircleToggle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or
+       input.UserInputType == Enum.UserInputType.Touch then
+        circleDragging = true
+        circleStart = input.Position
+        circlePos = CircleToggle.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                circleDragging = false
+            end
+        end)
+    end
+end)
+
+CircleToggle.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or
+       input.UserInputType == Enum.UserInputType.Touch then
+        circleInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if circleDragging and input == circleInput then
+        local delta = input.Position - circleStart
+        CircleToggle.Position = UDim2.new(
+            circlePos.X.Scale,
+            circlePos.X.Offset + delta.X,
+            circlePos.Y.Scale,
+            circlePos.Y.Offset + delta.Y
+        )
+    end
+end)
